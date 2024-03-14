@@ -3,7 +3,7 @@ module Molecules where
 import Data.Char
 
 
-data TokenType = Molecule | Number Int | OBrackets | CBrackets | OSquareBrackets | CSquareBrackets | OCurlyBrackets | CCurlyBrackets 
+data TokenType = Atom | Number Int | OBrackets | CBrackets | OSquareBrackets | CSquareBrackets | OCurlyBrackets | CCurlyBrackets 
   deriving (Eq, Ord, Read, Show)
   
 data Token = Token { 
@@ -44,7 +44,7 @@ lexer str =
         if isUpper c then
           let (lower, rest) = splitLower s in
             case lexer rest of
-              Right tokens -> Right (Token { tokenType=Molecule, tokenStr=c:lower } : tokens)
+              Right tokens -> Right (Token { tokenType=Atom, tokenStr=c:lower } : tokens)
               Left err -> Left err
         else Left ("The character '" ++ [c] ++ "' should be in upper case or a number")
     else Left ("The character '" ++ [c] ++ "' is not valid")

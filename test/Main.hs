@@ -21,18 +21,18 @@ main = hspec $ do
 
   describe "molecule name" $ do
     it "Single letter" $ do
-      lexer "H" `shouldBe` Right [Token {tokenType=Molecule, tokenStr="H"}]
+      lexer "H" `shouldBe` Right [Token {tokenType=Atom, tokenStr="H"}]
     it "Multiple letters" $ do
-      lexer "He" `shouldBe` Right [Token {tokenType=Molecule, tokenStr="He"}]
+      lexer "He" `shouldBe` Right [Token {tokenType=Atom, tokenStr="He"}]
 
   describe "Multiple molecules" $ do
     it "Single letter" $ do
-      lexer "HF" `shouldBe` Right [Token {tokenType=Molecule, tokenStr="H"}, Token {tokenType=Molecule, tokenStr="F"}]
+      lexer "HF" `shouldBe` Right [Token {tokenType=Atom, tokenStr="H"}, Token {tokenType=Atom, tokenStr="F"}]
     it "Two letters" $ do
       lexer "HeFFa" `shouldBe` Right [
-        Token {tokenType=Molecule, tokenStr="He"},
-        Token {tokenType=Molecule, tokenStr="F"},
-        Token {tokenType=Molecule, tokenStr="Fa"}]
+        Token {tokenType=Atom, tokenStr="He"},
+        Token {tokenType=Atom, tokenStr="F"},
+        Token {tokenType=Atom, tokenStr="Fa"}]
 
   describe "Handle erros" $ do
     it "Is not a molecule" $ do
