@@ -76,7 +76,7 @@ library
     -- Base language which the package is written in.
     default-language: Haskell2010
 
-test-suite molecules-test
+test-suite spec
     -- Import common warning flags.
     import:           warnings
 
@@ -101,5 +101,6 @@ test-suite molecules-test
     -- Test dependencies.
     build-depends:
         base ^>=4.17.2.1,
-        HUnit,
+        hspec,
         molecules
+
