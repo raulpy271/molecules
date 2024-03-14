@@ -1,6 +1,6 @@
 module Main (main) where
 
-
+import Data.Either
 import Test.Hspec
 import Control.Exception (evaluate)
 import Molecules
@@ -9,32 +9,36 @@ main :: IO ()
 main = hspec $ do
   describe "brackets" $ do
     it "brackets" $ do
-      lexer "()" `shouldBe` [Token {tokenType=OBrackets, tokenStr="("}, Token {tokenType=CBrackets, tokenStr=")"}]
+      lexer "()" `shouldBe` Right [Token {tokenType=OBrackets, tokenStr="("}, Token {tokenType=CBrackets, tokenStr=")"}]
     it "square brackets" $ do
-      lexer "[]" `shouldBe` [Token {tokenType=OSquareBrackets, tokenStr="["}, Token {tokenType=CSquareBrackets, tokenStr="]"}]
+      lexer "[]" `shouldBe` Right [Token {tokenType=OSquareBrackets, tokenStr="["}, Token {tokenType=CSquareBrackets, tokenStr="]"}]
 
   describe "numbers" $ do
     it "One digit" $ do
-      lexer "1" `shouldBe` [Token {tokenType=Number 1, tokenStr="1"}]
+      lexer "1" `shouldBe` Right [Token {tokenType=Number 1, tokenStr="1"}]
     it "Multiple digits" $ do
-      lexer "12" `shouldBe` [Token {tokenType=Number 12, tokenStr="12"}]
+      lexer "12" `shouldBe` Right [Token {tokenType=Number 12, tokenStr="12"}]
 
   describe "molecule name" $ do
     it "Single letter" $ do
-      lexer "H" `shouldBe` [Token {tokenType=Molecule, tokenStr="H"}]
+      lexer "H" `shouldBe` Right [Token {tokenType=Molecule, tokenStr="H"}]
     it "Multiple letters" $ do
-      lexer "He" `shouldBe` [Token {tokenType=Molecule, tokenStr="He"}]
-    it "wrong name" $ do
-      lexer "h" `shouldBe` []
+      lexer "He" `shouldBe` Right [Token {tokenType=Molecule, tokenStr="He"}]
 
   describe "Multiple molecules" $ do
     it "Single letter" $ do
-      lexer "HF" `shouldBe` [Token {tokenType=Molecule, tokenStr="H"}, Token {tokenType=Molecule, tokenStr="F"}]
+      lexer "HF" `shouldBe` Right [Token {tokenType=Molecule, tokenStr="H"}, Token {tokenType=Molecule, tokenStr="F"}]
     it "Two letters" $ do
-      lexer "HeFFa" `shouldBe` [
+      lexer "HeFFa" `shouldBe` Right [
         Token {tokenType=Molecule, tokenStr="He"},
         Token {tokenType=Molecule, tokenStr="F"},
         Token {tokenType=Molecule, tokenStr="Fa"}]
+
+  describe "Handle erros" $ do
+    it "Is not a molecule" $ do
+      isLeft (lexer "h") `shouldBe` True
+    it "Is not a valid char" $ do
+      isLeft (lexer "+") `shouldBe` True
 
   describe "splitNumber" $ do
     it "One digit" $ do

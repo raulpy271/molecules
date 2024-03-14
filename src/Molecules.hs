@@ -11,27 +11,43 @@ data Token = Token {
   tokenStr :: String
 } deriving (Eq, Ord, Read, Show)
 
-lexer :: String -> [Token]
-lexer [] = []
-lexer ('(':s) = Token { tokenType=OBrackets, tokenStr="(" } : lexer s
-lexer (')':s) = Token { tokenType=CBrackets, tokenStr=")" } : lexer s
-lexer ('[':s) = Token { tokenType=OSquareBrackets, tokenStr="[" } : lexer s
-lexer (']':s) = Token { tokenType=CSquareBrackets, tokenStr="]" } : lexer s
-lexer ('{':s) = Token { tokenType=OCurlyBrackets, tokenStr="{" } : lexer s
-lexer ('}':s) = Token { tokenType=CCurlyBrackets, tokenStr="}" } : lexer s
+lexer :: String -> Either String [Token]
+lexer [] = Right []
+lexer ('(':s) = case lexer s of
+  Right tokens -> Right (Token { tokenType=OBrackets, tokenStr="(" } : tokens)
+  Left err -> Left err
+lexer (')':s) = case lexer s of
+  Right tokens -> Right (Token { tokenType=CBrackets, tokenStr=")" } : tokens)
+  Left err -> Left err
+lexer ('[':s) = case lexer s of
+  Right tokens -> Right (Token { tokenType=OSquareBrackets, tokenStr="[" } : tokens)
+  Left err -> Left err
+lexer (']':s) = case lexer s of
+  Right tokens -> Right (Token { tokenType=CSquareBrackets, tokenStr="]" } : tokens)
+  Left err -> Left err
+lexer ('{':s) = case lexer s of
+  Right tokens -> Right (Token { tokenType=OCurlyBrackets, tokenStr="{" } : tokens)
+  Left err -> Left err
+lexer ('}':s) = case lexer s of
+  Right tokens -> Right (Token { tokenType=CCurlyBrackets, tokenStr="}" } : tokens)
+  Left err -> Left err
 
 lexer str =
   let (c:s) = str in
     if isAlphaNum c then
       if isDigit c then
         let (digits, rest) = splitNumber str in
-          Token { tokenType=Number (read digits), tokenStr=digits } : lexer rest
+          case lexer rest of
+            Right tokens -> Right (Token { tokenType=Number (read digits), tokenStr=digits } : tokens)
+            Left err -> Left err
       else 
         if isUpper c then
           let (lower, rest) = splitLower s in
-            Token { tokenType=Molecule, tokenStr=c:lower } : lexer rest
-        else lexer s
-    else lexer s
+            case lexer rest of
+              Right tokens -> Right (Token { tokenType=Molecule, tokenStr=c:lower } : tokens)
+              Left err -> Left err
+        else Left ("The character '" ++ [c] ++ "' should be in upper case or a number")
+    else Left ("The character '" ++ [c] ++ "' is not valid")
 
 splitNumber = splitWhile isDigit
 
